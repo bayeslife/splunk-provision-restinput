@@ -7,5 +7,5 @@ creates the input
 
 Sample command line
 ```
-DEBUG=splunk-provision-restinput node restapis.js --name healthcheck1 --url http://DEV00055.ldstatdv.net:1080/api/healthcheck  --username <username> --password <password> --splunkHost "splunkserver.net" --reportedHost "sourcehost" --clean true
+DEBUG=splunk-provision-restinput node restapis.js --name healthcheck1 --url http://localhost:1080/api/healthcheck  --username <username> --password <password> --splunkHost "splunkserver.net" --reportedHost "sourcehost" --clean true
 ```
