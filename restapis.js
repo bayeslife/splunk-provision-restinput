@@ -35,12 +35,21 @@ var args = yargs
     .alias('s', 'splunkHost')
     .describe('s', 'Splunk Host that input will be registered at')
 
+    .demand('x')
+    .alias('x', 'index')
+    .describe('x', 'Splunk Index')
+
     .alias('c', 'clean')
     .describe('c', 'Clean existing')
+
+    .alias('a', 'add')
+    .describe('a', 'Add a rest modular input')
     .parse(process.argv);
 
 var service=null;
 var restInputs=null;
+
+
 
 splunkjs.Service.RestInput = splunkjs.Service.Entity.extend({
     path: function() {
@@ -120,31 +129,36 @@ function setup(){
 
 function create(){
     return new Promise(function(resolve,reject){
-        debug("create");
+        console.log('aaa')
         if(DEV){
           debug("create done");
           resolve();
         }else {
-          restInputs.create({
-              name: args.name,
-              host: args.reportedHost,
-              endpoint: args.url,
-              response_type: 'json',
-              http_method: 'GET',
-              response_filter_pattern: '.*',
-              request_timeout: 20,
-              sourcetype: '_json',
-              polling_interval: 60,
-              index: 'int-prod',
-              auth_type: 'none'
-          },function(err,createdInput){
-              if(err){
-                console.log(err);
-                reject(err);
-              }else {
-                resolve();
-              }
-          });
+          if(!args.add){
+            resolve();
+          }else {
+            debug("create");
+            restInputs.create({
+                name: args.name,
+                host: args.reportedHost,
+                endpoint: args.url,
+                response_type: 'json',
+                http_method: 'GET',
+                response_filter_pattern: '.*',
+                request_timeout: 20,
+                sourcetype: '_json',
+                polling_interval: 20,
+                index: args.index,
+                auth_type: 'none'
+            },function(err,createdInput){
+                if(err){
+                  console.log(err);
+                  reject(err);
+                }else {
+                  resolve();
+                }
+            });
+          }
         }
       });
 }
@@ -155,8 +169,8 @@ function remove(){
       if(DEV){
         resolve();
       }else {
-        if(args.clean){                
-          existing.del("",{                         
+        if(args.clean  && existing){
+          existing.del("",{
           },function(err,createdInput){
               if(err){
                 console.log(err);
@@ -165,6 +179,8 @@ function remove(){
                 resolve();
               }
           });
+        }else {
+          resolve();
         }
       }
     });
@@ -193,7 +209,7 @@ function fetch(){
                   if(r.name === args.name){
                     console.log("Found existing");
                     existing = r;
-                  }                    
+                  }
               }
               resolve();
             }
