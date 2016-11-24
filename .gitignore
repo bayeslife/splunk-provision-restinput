@@ -1,0 +1,5 @@
+
+node_modules
+.splunk
+.idea
+provision.sh
